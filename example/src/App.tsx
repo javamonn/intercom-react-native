@@ -69,6 +69,26 @@ export default function App() {
 
   useEffect(() => {
     /**
+     * The fetch below will cause a crash when executed on Android.
+     *
+     * io.intercom.android:intercom-sdk:10.+ has a dependency on Okhttp 4, which is incompatible
+     * with Okhttp 3. The intercom documentation states that the latest major version of Okhttp
+     * is required: https://developers.intercom.com/installing-intercom/docs/android-installation
+     *
+     * react-native uses Okhttp 3, though an upgrade to Okhttp 4 is planned for the next release
+     * (https://github.com/facebook/react-native/commit/8207e97f9174a04e319431193c0f63d47a093c44)
+     *
+     * It appears that the below crashes specifically because the response includes a set-cookie
+     * header. Other http requests seem to perform fine, though other API incompatibilies would
+     * not be unexpected
+     */
+    fetch('https://facebook.com')
+      .then((res) => res.text())
+      .then((text) => {
+        console.log(text);
+      });
+
+    /**
      * Restore user login status
      */
     AsyncStorage.getItem(AUTK_KEY).then((it) => {
